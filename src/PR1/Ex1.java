@@ -10,39 +10,48 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.RecursiveTask;
 
+import static java.lang.StringTemplate.STR;
+
 public class Ex1 {
+
+    private static long memoryUsed = 0L;
 
     public static void main(String[] args) throws InterruptedException,
             ExecutionException {
         List<Integer> testList = setUp(10_000);
 
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         int result = calculateSum(testList);
-        long endTime = System.nanoTime();
-        long durationInMilliseconds = (endTime - startTime) / 1_000_000;
-        System.out.println("Время выполнения последовательной функции: " +
-                durationInMilliseconds + " миллисекунд. Результат - " + result);
-
-        startTime = System.nanoTime();
+        long endTime = System.currentTimeMillis();
+        printTimeAndMemoryUsage(
+                STR."Single Thread: \{ result }",
+                startTime,
+                endTime
+        );
+        startTime = System.currentTimeMillis();
         result = calculateSumMultiThread(testList);
-        endTime = System.nanoTime();
-        durationInMilliseconds = (endTime - startTime) / 1_000_000;
-        System.out.println("Время выполнения многопоточной функции: " +
-                durationInMilliseconds + " миллисекунд. Результат - " + result);
-
-        startTime = System.nanoTime();
+        endTime = System.currentTimeMillis();
+        printTimeAndMemoryUsage(
+                STR."Multi Thread: \{ result }",
+                startTime,
+                endTime
+        );
+        startTime = System.currentTimeMillis();
         result = calculateSumFork(testList);
-        endTime = System.nanoTime();
-        durationInMilliseconds = (endTime - startTime) / 1_000_000;
-        System.out.println("Время выполнения форк функции: " +
-                durationInMilliseconds + " миллисекунд. Результат - " + result);
-
-        startTime = System.nanoTime();
-        result = calculateVirtualThreadsSum(testList, 1000);
-        endTime = System.nanoTime();
-        durationInMilliseconds = (endTime - startTime) / 1_000_000;
-        System.out.println("Время выполнения виртуальных потоков: " +
-                durationInMilliseconds + " миллисекунд. Результат - " + result);
+        endTime = System.currentTimeMillis();
+        printTimeAndMemoryUsage(
+                STR."ForkJoinPool: \{ result }",
+                startTime,
+                endTime
+        );
+        startTime = System.currentTimeMillis();
+        result = calculateVirtualThreadsSum(testList, 500);
+        endTime = System.currentTimeMillis();
+        printTimeAndMemoryUsage(
+                STR."Virtual Thread: \{ result }",
+                startTime,
+                endTime
+        );
     }
     private static List<Integer> setUp(int size) {
         List<Integer> list = new ArrayList<>();
@@ -159,6 +168,22 @@ public class Ex1 {
         }
     }
 
+    private static void printTimeAndMemoryUsage(String method, long startTime,
+                                                long endTime)
+    {
+        long elapsedTime = endTime - startTime;
+        System.out.println("Метод " + method + ":");
+        System.out.println("Время выполнения: " + elapsedTime + " мс");
+        Runtime runtime = Runtime.getRuntime();
+        long memoryOperationUsed = memoryUsed == 0 || runtime.freeMemory() > memoryUsed
+        ? runtime.totalMemory() - runtime.freeMemory()
+        : memoryUsed - runtime.freeMemory();
+        memoryUsed = runtime.freeMemory();
+        System.out.println("Использование памяти: " + memoryOperationUsed / (1024 * 1024)
+                + " МБ");
+        System.out.println();
+    }
+
     static class SumCalculatingTask extends RecursiveTask<Integer> {
         private final List<Integer> list;
         private final int start;
@@ -171,7 +196,7 @@ public class Ex1 {
 
         @Override
         protected Integer compute() {
-            if (end - start <= 100) {
+            if (end - start <= 50) {
                 try {
                     return calculateSubListSum(list.subList(start, end));
                 } catch (InterruptedException e) {
