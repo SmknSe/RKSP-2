@@ -179,8 +179,8 @@ public class Ex1 {
         ? runtime.totalMemory() - runtime.freeMemory()
         : memoryUsed - runtime.freeMemory();
         memoryUsed = runtime.freeMemory();
-        System.out.println("Использование памяти: " + memoryOperationUsed / (1024 * 1024)
-                + " МБ");
+        System.out.println("Использование памяти: " + memoryOperationUsed / (1024)
+                + " КБ");
         System.out.println();
     }
 
