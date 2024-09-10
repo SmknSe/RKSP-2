@@ -9,20 +9,20 @@ public class ChecksumCalculator {
     public static short calculateChecksum(String filePath) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(filePath);
              FileChannel fileChannel = fileInputStream.getChannel()) {
-            ByteBuffer buffer = ByteBuffer.allocate(2); // Создаем буфер для хранения 2 байт
+            ByteBuffer buffer = ByteBuffer.allocate(2);
             short checksum = 0;
             while (fileChannel.read(buffer) != -1) {
-                buffer.flip(); // Переключаем буфер в режим чтения
+                buffer.flip();
                 while (buffer.hasRemaining()) {
-                    checksum ^= buffer.get(); // Выполняем XOR над байтами
+                    checksum ^= buffer.get();
                 }
-                buffer.clear(); // Очищаем буфер для следующего чтения
+                buffer.clear();
             }
             return checksum;
         }
     }
     public static void main(String[] args) {
-        String filePath = "sample.txt"; // Путь к файлу, для которого нужно вычислить контрольную сумму
+        String filePath = "sample.txt";
         try {
             short checksum = calculateChecksum(filePath);
             System.out.printf("Контрольная сумма файла %s: 0x%04X%n", filePath,

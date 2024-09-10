@@ -1,5 +1,6 @@
 package PR1;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -8,7 +9,27 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Ex2 {
     public static void main(String[] args) {
+
+        ConcurrentLinkedQueue<Future<Integer>> queue = new ConcurrentLinkedQueue<>();
+
         try (ExecutorService executorService = Executors.newFixedThreadPool(12)) {
+            executorService.submit(()->{
+                while (true) {
+                    for (var f : queue) {
+                        if (f.isDone()) {
+                            try {
+                                var res = f.get();
+                                System.out.println("Result: "+res);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            } catch (ExecutionException e) {
+                                throw new RuntimeException(e);
+                            }
+                            queue.remove(f);
+                        }
+                    }
+                }
+            });
             while (true) {
                 try {
                     System.out.print("Введите число (или 'exit' для выхода): ");
@@ -21,16 +42,9 @@ public class Ex2 {
 
                     int number = Integer.parseInt(userInput);
 
-                    Future<Integer> future = executorService.submit(() ->
-                            calculateSquare(number));
+                    queue.add(executorService.submit(() ->
+                            calculateSquare(number)));
 
-                    try {
-                        int result = future.get();
-                        System.out.println("Результат: " + result);
-                    } catch (InterruptedException | ExecutionException e) {
-                        System.err.println("Ошибка при выполнении запроса: " +
-                                e.getMessage());
-                    }
                 } catch (NumberFormatException e) {
                     System.err.println("Неверный формат числа. Пожалуйста, введите целое число.");
                 }

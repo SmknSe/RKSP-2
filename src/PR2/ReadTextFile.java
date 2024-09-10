@@ -10,9 +10,9 @@ public class ReadTextFile {
         String fileName = "sample.txt";
 
         String[] lines = {
-                "Это первая строка текста.",
-                "Это вторая строка текста.",
-                "Это третья строка текста."
+                "First line",
+                "Second line",
+                "Third line"
         };
 
         writeLinesToFile(fileName, lines);

@@ -13,27 +13,27 @@ public class FileCopyComparison {
     private static long memoryUsed = 0L;
 
     public static void main(String[] args) throws IOException {
-        String sourceFile = "source.txt"; // Имя исходного файла
-        String destinationFile = "destination.txt"; // Имя файла назначения
-        // Создание файла размером 100 МБ
+        String sourceFile = "source.txt";
+        String destinationFile = "destination.txt";
+
         createLargeFile(sourceFile, 100);
-        // Метод 1: FileInputStream/FileOutputStream
+
         long startTime1 = System.currentTimeMillis();
         copyUsingFileStreams(sourceFile, destinationFile);
         long endTime1 = System.currentTimeMillis();
         printTimeAndMemoryUsage("FileInputStream/FileOutputStream", startTime1,
                 endTime1);
-        // Метод 2: FileChannel
+
         long startTime2 = System.currentTimeMillis();
         copyUsingFileChannel(sourceFile, destinationFile);
         long endTime2 = System.currentTimeMillis();
         printTimeAndMemoryUsage("FileChannel", startTime2, endTime2);
-        // Метод 3: Apache Commons IO
+
         long startTime3 = System.currentTimeMillis();
         copyUsingApacheCommonsIO(sourceFile, destinationFile);
         long endTime3 = System.currentTimeMillis();
         printTimeAndMemoryUsage("Apache Commons IO", startTime3, endTime3);
-        // Метод 4: Files class
+
         long startTime4 = System.currentTimeMillis();
         copyUsingFilesClass(sourceFile, destinationFile);
         long endTime4 = System.currentTimeMillis();
@@ -95,8 +95,8 @@ public class FileCopyComparison {
                 ? runtime.totalMemory() - runtime.freeMemory()
                 : memoryUsed - runtime.freeMemory();
         memoryUsed = runtime.freeMemory();
-        System.out.println("Использование памяти: " + memoryOperationUsed / (1024 * 1024)
-                + " МБ");
+        System.out.println("Использование памяти: " + memoryOperationUsed / (1024)
+                + "  КБ");
         System.out.println();
     }
 }
