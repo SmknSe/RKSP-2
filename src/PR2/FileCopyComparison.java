@@ -98,6 +98,7 @@ public class FileCopyComparison {
         System.out.println("Использование памяти: " + memoryOperationUsed / (1024)
                 + "  КБ");
         System.out.println();
+        runtime.gc();
     }
 }
 
